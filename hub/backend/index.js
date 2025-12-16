@@ -25,20 +25,23 @@ const path = require('path');
 // Determine the correct public directory
 // Deployment structure shows: /app/backend (current dir) and /app/frontend/dist (target)
 const possiblePaths = [
-  path.join(__dirname, 'public'),           // /app/backend/public (Docker standard)
-  path.join(__dirname, '../frontend/dist'), // /app/frontend/dist (Nixpacks monorepo)
+  path.join(__dirname, 'public'),              // /app/backend/public (Docker standard)
+  path.join(__dirname, '../frontend/dist'),    // /app/frontend/dist (Nixpacks monorepo)
   path.join(__dirname, '../../frontend/dist'), // Fallback
+  '/app/frontend/dist',                        // Absolute path (Nixpacks)
 ];
 
 let publicDir = possiblePaths[0];
+console.log('Checking for frontend build in the following locations:');
 for (const testPath of possiblePaths) {
-  if (fs.existsSync(testPath)) {
+  const exists = fs.existsSync(testPath);
+  console.log(`  ${testPath}: ${exists ? 'EXISTS' : 'NOT FOUND'}`);
+  if (exists && publicDir === possiblePaths[0]) {
     publicDir = testPath;
-    break;
   }
 }
 
-console.log(`Serving static files from: ${publicDir}`);
+console.log(`✓ Serving static files from: ${publicDir}`);
 
 // Serve static files from the React app
 app.use(express.static(publicDir));
