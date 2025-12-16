@@ -19,15 +19,34 @@ app.get('/health', (req, res) => {
 // app.use('/api/auth', authRoutes);
 // app.use('/api/robots', robotRoutes);
 
+const fs = require('fs');
 const path = require('path');
 
+// Determine the correct public directory
+// Check 'public' (Docker/standard) and '../frontend/dist' (Monorepo/Dev)
+let publicDir = path.join(__dirname, 'public');
+if (!fs.existsSync(publicDir)) {
+  const potentialDir = path.join(__dirname, '../frontend/dist');
+  if (fs.existsSync(potentialDir)) {
+    publicDir = potentialDir;
+  }
+}
+
+console.log(`Serving static files from: ${publicDir}`);
+
 // Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(publicDir));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  const indexPath = path.join(publicDir, 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error(`Frontend not found at ${indexPath}`);
+    res.status(404).send('Frontend application not found. Please ensure it is built.');
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
