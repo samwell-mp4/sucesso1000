@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Eye, Plus, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import '../styles/Clients.css';
@@ -14,6 +15,7 @@ interface Client {
 }
 
 const Clients = () => {
+    const navigate = useNavigate();
     const [clients, setClients] = useState<Client[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -113,7 +115,10 @@ const Clients = () => {
                                     <td>{client.seller}</td>
                                     <td>{new Date(client.start_date).toLocaleDateString()}</td>
                                     <td>
-                                        <button className="action-button">
+                                        <button
+                                            className="action-button"
+                                            onClick={() => navigate(`/clients/${client.id}`)}
+                                        >
                                             <Eye size={16} style={{ marginRight: '0.25rem', verticalAlign: 'middle' }} />
                                             Ver
                                         </button>

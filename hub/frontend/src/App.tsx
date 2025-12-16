@@ -4,9 +4,11 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Robots from './pages/Robots';
 import Clients from './pages/Clients';
+import ClientDetails from './pages/ClientDetails';
 import Schedule from './pages/Schedule';
 import Conversations from './pages/Conversations';
 import Sales from './pages/Sales';
+import Financial from './pages/Financial';
 import Affiliates from './pages/Affiliates';
 // Settings page
 import Settings from './pages/SettingsPage';
@@ -28,9 +30,11 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/robots" element={<Robots />} />
               <Route path="/clients" element={<Clients />} />
+              <Route path="/clients/:id" element={<ClientDetails />} />
               <Route path="/schedule" element={<Schedule />} />
               <Route path="/conversations" element={<Conversations />} />
               <Route path="/sales" element={<Sales />} />
+              <Route path="/financial" element={<Financial />} />
               <Route path="/affiliates" element={<Affiliates />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/seed" element={<SeedData />} />

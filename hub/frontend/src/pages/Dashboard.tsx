@@ -1,69 +1,181 @@
-import { useAuth } from '../contexts/AuthContext';
-import { Bot, Users, Calendar, MessageSquare, DollarSign } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import {
+    Users,
+    Bot,
+    MessageSquare,
+    DollarSign,
+    TrendingUp,
+    TrendingDown
+} from 'lucide-react';
+import {
+    AreaChart,
+    Area,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    ResponsiveContainer,
+    BarChart,
+    Bar,
+    Legend
+} from 'recharts';
+import { supabase } from '../lib/supabase';
 import '../styles/Dashboard.css';
 
 const Dashboard = () => {
-    const { user } = useAuth();
-    const isAdmin = user?.role === 'admin';
+    const [stats, setStats] = useState({
+        clients: 0,
+        robots: 0,
+        conversations: 0,
+        revenue: 0,
+        expenses: 0
+    });
+    const [loading, setLoading] = useState(true);
 
-    // Mock data
-    const stats = [
-        { label: 'Robôs Ativos', value: '124', icon: Bot, color: '#3b82f6', bg: '#eff6ff' },
-        { label: 'Clientes Ativos', value: '85', icon: Users, color: '#10b981', bg: '#ecfdf5' },
-        { label: 'Reuniões Hoje', value: '4', icon: Calendar, color: '#f59e0b', bg: '#fffbeb' },
-        { label: 'Conversas Ativas', value: '28', icon: MessageSquare, color: '#8b5cf6', bg: '#f5f3ff' },
+    // Mock data for charts (replace with real data later)
+    const financialData = [
+        { name: 'Jan', receita: 4000, despesa: 2400 },
+        { name: 'Fev', receita: 3000, despesa: 1398 },
+        { name: 'Mar', receita: 2000, despesa: 9800 },
+        { name: 'Abr', receita: 2780, despesa: 3908 },
+        { name: 'Mai', receita: 1890, despesa: 4800 },
+        { name: 'Jun', receita: 2390, despesa: 3800 },
+        { name: 'Jul', receita: 3490, despesa: 4300 },
     ];
 
-    if (isAdmin) {
-        stats.push({ label: 'Vendas do Mês', value: 'R$ 45.200', icon: DollarSign, color: '#ec4899', bg: '#fdf2f8' });
-    }
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    const fetchStats = async () => {
+        try {
+            // Fetch counts
+            const { count: clientsCount } = await supabase.from('clients').select('*', { count: 'exact', head: true });
+            const { count: robotsCount } = await supabase.from('robots').select('*', { count: 'exact', head: true });
+            const { count: conversationsCount } = await supabase.from('conversations').select('*', { count: 'exact', head: true });
+
+            // Fetch financial totals (mock for now or simple sum)
+            // const { data: income } = await supabase.from('income').select('value');
+            // const { data: expenses } = await supabase.from('expenses').select('value');
+
+            setStats({
+                clients: clientsCount || 0,
+                robots: robotsCount || 0,
+                conversations: conversationsCount || 0,
+                revenue: 15400, // Mock
+                expenses: 8200  // Mock
+            });
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const KPICard = ({ title, value, icon: Icon, trend, color }: any) => (
+        <div className="kpi-card">
+            <div className="kpi-header">
+                <div className={`kpi-icon-wrapper ${color}`}>
+                    <Icon size={24} />
+                </div>
+                {trend && (
+                    <span className={`kpi-trend ${trend > 0 ? 'positive' : 'negative'}`}>
+                        {trend > 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                        {Math.abs(trend)}%
+                    </span>
+                )}
+            </div>
+            <div className="kpi-content">
+                <h3 className="kpi-value">{typeof value === 'number' && value > 1000 ? `R$ ${value.toLocaleString()}` : value}</h3>
+                <p className="kpi-title">{title}</p>
+            </div>
+        </div>
+    );
 
     return (
-        <div>
+        <div className="dashboard-container">
             <div className="page-header">
-                <div>
-                    <h1 className="page-title">Dashboard</h1>
-                    <p className="text-secondary">Bem-vindo de volta, {user?.name}</p>
+                <h1 className="page-title">Dashboard</h1>
+                <div className="date-filter">
+                    <select className="form-input" style={{ width: 'auto' }}>
+                        <option>Últimos 30 dias</option>
+                        <option>Este Mês</option>
+                        <option>Este Ano</option>
+                    </select>
                 </div>
             </div>
 
-            <div className="dashboard-stats">
-                {stats.map((stat, index) => (
-                    <div key={index} className="stat-card">
-                        <div className="stat-icon-wrapper" style={{ backgroundColor: stat.bg }}>
-                            <stat.icon size={24} color={stat.color} />
-                        </div>
-                        <div className="stat-info">
-                            <p className="stat-label">{stat.label}</p>
-                            <p className="stat-value">{stat.value}</p>
-                        </div>
-                    </div>
-                ))}
+            <div className="kpi-grid">
+                <KPICard
+                    title="Clientes Ativos"
+                    value={stats.clients}
+                    icon={Users}
+                    trend={12}
+                    color="blue"
+                />
+                <KPICard
+                    title="Robôs em Operação"
+                    value={stats.robots}
+                    icon={Bot}
+                    trend={5}
+                    color="purple"
+                />
+                <KPICard
+                    title="Conversas Hoje"
+                    value={stats.conversations}
+                    icon={MessageSquare}
+                    trend={-2}
+                    color="orange"
+                />
+                <KPICard
+                    title="Receita Mensal"
+                    value={stats.revenue}
+                    icon={DollarSign}
+                    trend={8.5}
+                    color="green"
+                />
             </div>
 
-            <div className="dashboard-section">
-                <h2 className="section-title">Últimas Atividades</h2>
-                <div className="activity-list">
-                    <div className="activity-item">
-                        <div className="activity-content">
-                            <span className="activity-text">Novo cliente cadastrado: <strong>Empresa XYZ</strong></span>
-                            <span className="activity-time">Há 2 horas</span>
-                        </div>
-                        <span className="activity-badge badge-success">Novo Cliente</span>
+            <div className="charts-grid">
+                <div className="chart-card">
+                    <h3>Receita x Despesas</h3>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <AreaChart data={financialData}>
+                                <defs>
+                                    <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorDespesa" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                <YAxis axisLine={false} tickLine={false} />
+                                <Tooltip />
+                                <Legend />
+                                <Area type="monotone" dataKey="receita" stroke="#10b981" fillOpacity={1} fill="url(#colorReceita)" name="Receita" />
+                                <Area type="monotone" dataKey="despesa" stroke="#ef4444" fillOpacity={1} fill="url(#colorDespesa)" name="Despesa" />
+                            </AreaChart>
+                        </ResponsiveContainer>
                     </div>
-                    <div className="activity-item">
-                        <div className="activity-content">
-                            <span className="activity-text">Robô <strong>Bot-001</strong> desconectado</span>
-                            <span className="activity-time">Há 4 horas</span>
-                        </div>
-                        <span className="activity-badge badge-warning">Alerta</span>
-                    </div>
-                    <div className="activity-item">
-                        <div className="activity-content">
-                            <span className="activity-text">Venda realizada por <strong>João Silva</strong></span>
-                            <span className="activity-time">Há 5 horas</span>
-                        </div>
-                        <span className="activity-badge badge-success">Venda</span>
+                </div>
+
+                <div className="chart-card">
+                    <h3>Crescimento de Clientes</h3>
+                    <div style={{ width: '100%', height: 300 }}>
+                        <ResponsiveContainer>
+                            <BarChart data={financialData}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                <YAxis axisLine={false} tickLine={false} />
+                                <Tooltip cursor={{ fill: '#f3f4f6' }} />
+                                <Bar dataKey="receita" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Novos Clientes" />
+                            </BarChart>
+                        </ResponsiveContainer>
                     </div>
                 </div>
             </div>

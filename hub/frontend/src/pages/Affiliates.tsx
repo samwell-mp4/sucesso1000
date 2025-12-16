@@ -11,7 +11,7 @@ interface Affiliate {
     code: string;
     sales: number;
     total_sold: number;
-    active: boolean;
+    status: string;
 }
 
 const Affiliates = () => {
@@ -24,7 +24,7 @@ const Affiliates = () => {
         code: '',
         sales: 0,
         total_sold: 0,
-        active: true
+        status: 'active'
     });
 
     useEffect(() => {
@@ -50,17 +50,18 @@ const Affiliates = () => {
         }
     };
 
-    const toggleStatus = async (id: number, currentStatus: boolean) => {
+    const toggleStatus = async (id: number, currentStatus: string) => {
+        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
         try {
             const { error } = await supabase
                 .from('profiles')
-                .update({ active: !currentStatus })
+                .update({ status: newStatus })
                 .eq('id', id);
 
             if (error) throw error;
 
             setAffiliates(affiliates.map(aff =>
-                aff.id === id ? { ...aff, active: !aff.active } : aff
+                aff.id === id ? { ...aff, status: newStatus } : aff
             ));
         } catch (error) {
             console.error('Error updating status:', error);
@@ -75,7 +76,7 @@ const Affiliates = () => {
             // Here we just insert into profiles for the demo
             const { error } = await supabase
                 .from('profiles')
-                .insert([{ ...newAffiliate, role: 'seller' }]);
+                .insert([{ ...newAffiliate, role: 'seller', status: 'active' }]);
 
             if (error) throw error;
 
@@ -86,7 +87,7 @@ const Affiliates = () => {
                 code: '',
                 sales: 0,
                 total_sold: 0,
-                active: true
+                status: 'active'
             });
             fetchAffiliates();
         } catch (error) {
@@ -137,8 +138,8 @@ const Affiliates = () => {
                                         <label className="toggle-switch">
                                             <input
                                                 type="checkbox"
-                                                checked={aff.active}
-                                                onChange={() => toggleStatus(aff.id, aff.active)}
+                                                checked={aff.status === 'active'}
+                                                onChange={() => toggleStatus(aff.id, aff.status)}
                                             />
                                             <span className="slider"></span>
                                         </label>
