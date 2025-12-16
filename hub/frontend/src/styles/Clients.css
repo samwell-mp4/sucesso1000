@@ -1,0 +1,40 @@
+.clients-table-container {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    overflow-x: auto;
+}
+
+.client-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.client-status-active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.client-status-inactive {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.client-status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.client-name {
+    font-weight: 600;
+    color: #111827;
+}
+
+.client-plan {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
