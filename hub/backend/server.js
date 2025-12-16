@@ -39,13 +39,35 @@ app.use(express.static(publicDir));
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
+// Helper to list directories
+const listDir = (dirPath) => {
+  try {
+    if (!fs.existsSync(dirPath)) return `[${dirPath} does not exist]`;
+    return JSON.stringify(fs.readdirSync(dirPath), null, 2);
+  } catch (e) {
+    return `[Error reading ${dirPath}: ${e.message}]`;
+  }
+};
+
 app.get('*', (req, res) => {
   const indexPath = path.join(publicDir, 'index.html');
   if (fs.existsSync(indexPath)) {
     res.sendFile(indexPath);
   } else {
     console.error(`Frontend not found at ${indexPath}`);
-    res.status(404).send('Frontend application not found. Please ensure it is built.');
+
+    // DEBUG INFO
+    const debugInfo = `
+      <h1>Frontend not found</h1>
+      <p>Checked: ${indexPath}</p>
+      <p>Current Dir (__dirname): ${__dirname}</p>
+      <p>Files in current dir: ${listDir(__dirname)}</p>
+      <p>Files in ../: ${listDir(path.join(__dirname, '../'))}</p>
+      <p>Files in ../frontend: ${listDir(path.join(__dirname, '../frontend'))}</p>
+      <p>Files in ../frontend/dist: ${listDir(path.join(__dirname, '../frontend/dist'))}</p>
+    `;
+
+    res.status(404).send(debugInfo);
   }
 });
 
