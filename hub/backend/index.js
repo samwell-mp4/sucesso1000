@@ -23,12 +23,18 @@ const fs = require('fs');
 const path = require('path');
 
 // Determine the correct public directory
-// Check 'public' (Docker/standard) and '../frontend/dist' (Monorepo/Dev)
-let publicDir = path.join(__dirname, 'public');
-if (!fs.existsSync(publicDir)) {
-  const potentialDir = path.join(__dirname, '../frontend/dist');
-  if (fs.existsSync(potentialDir)) {
-    publicDir = potentialDir;
+// Deployment structure shows: /app/backend (current dir) and /app/frontend/dist (target)
+const possiblePaths = [
+  path.join(__dirname, 'public'),           // /app/backend/public (Docker standard)
+  path.join(__dirname, '../frontend/dist'), // /app/frontend/dist (Nixpacks monorepo)
+  path.join(__dirname, '../../frontend/dist'), // Fallback
+];
+
+let publicDir = possiblePaths[0];
+for (const testPath of possiblePaths) {
+  if (fs.existsSync(testPath)) {
+    publicDir = testPath;
+    break;
   }
 }
 
