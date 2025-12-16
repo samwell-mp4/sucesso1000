@@ -4,7 +4,7 @@
     "description": "Bootstrap HUB for EasyPanel",
     "main": "server.js",
     "scripts": {
-        "start": "node server.js"
+        "start": "cd backend && npm start"
     },
     "engines": {
         "node": ">=20"

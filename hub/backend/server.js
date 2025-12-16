@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Basic health check
-app.get('/', (req, res) => {
+app.get('/health', (req, res) => {
   res.send('Sucesso1000 Hub Backend is running');
 });
 
