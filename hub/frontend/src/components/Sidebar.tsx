@@ -21,7 +21,7 @@ const Sidebar = () => {
     return (
         <aside className="sidebar">
             <div className="sidebar-header">
-                <h1 className="sidebar-title">Sucesso1000</h1>
+                <h1 className="sidebar-logo">Sucesso1000</h1>
             </div>
 
             <nav className="sidebar-nav">

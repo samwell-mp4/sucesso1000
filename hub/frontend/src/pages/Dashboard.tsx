@@ -21,18 +21,20 @@ const Dashboard = () => {
 
     return (
         <div>
-            <div className="dashboard-header">
-                <h1 className="dashboard-title">Dashboard</h1>
-                <p className="dashboard-subtitle">Bem-vindo de volta, {user?.name}</p>
+            <div className="page-header">
+                <div>
+                    <h1 className="page-title">Dashboard</h1>
+                    <p className="text-secondary">Bem-vindo de volta, {user?.name}</p>
+                </div>
             </div>
 
-            <div className="stats-grid">
+            <div className="dashboard-stats">
                 {stats.map((stat, index) => (
                     <div key={index} className="stat-card">
                         <div className="stat-icon-wrapper" style={{ backgroundColor: stat.bg }}>
                             <stat.icon size={24} color={stat.color} />
                         </div>
-                        <div className="stat-content">
+                        <div className="stat-info">
                             <p className="stat-label">{stat.label}</p>
                             <p className="stat-value">{stat.value}</p>
                         </div>
@@ -42,27 +44,27 @@ const Dashboard = () => {
 
             <div className="dashboard-section">
                 <h2 className="section-title">Últimas Atividades</h2>
-                <div className="recent-activity-list">
+                <div className="activity-list">
                     <div className="activity-item">
-                        <div className="activity-info">
+                        <div className="activity-content">
                             <span className="activity-text">Novo cliente cadastrado: <strong>Empresa XYZ</strong></span>
                             <span className="activity-time">Há 2 horas</span>
                         </div>
-                        <span className="status-badge status-success">Novo Cliente</span>
+                        <span className="activity-badge badge-success">Novo Cliente</span>
                     </div>
                     <div className="activity-item">
-                        <div className="activity-info">
+                        <div className="activity-content">
                             <span className="activity-text">Robô <strong>Bot-001</strong> desconectado</span>
                             <span className="activity-time">Há 4 horas</span>
                         </div>
-                        <span className="status-badge status-warning">Alerta</span>
+                        <span className="activity-badge badge-warning">Alerta</span>
                     </div>
                     <div className="activity-item">
-                        <div className="activity-info">
+                        <div className="activity-content">
                             <span className="activity-text">Venda realizada por <strong>João Silva</strong></span>
                             <span className="activity-time">Há 5 horas</span>
                         </div>
-                        <span className="status-badge status-success">Venda</span>
+                        <span className="activity-badge badge-success">Venda</span>
                     </div>
                 </div>
             </div>

@@ -10,7 +10,7 @@ import Sales from './pages/Sales';
 import Affiliates from './pages/Affiliates';
 // Settings page
 import Settings from './pages/SettingsPage';
-Page';
+import SeedData from './pages/SeedData';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 import './styles/index.css';
@@ -33,6 +33,7 @@ function App() {
               <Route path="/sales" element={<Sales />} />
               <Route path="/affiliates" element={<Affiliates />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/seed" element={<SeedData />} />
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Route>

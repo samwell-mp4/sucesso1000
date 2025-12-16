@@ -1,40 +1,49 @@
 .clients-table-container {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    overflow-x: auto;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    overflow: hidden;
+}
+
+.client-name {
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.client-plan {
+    display: inline-block;
+    padding: 0.125rem 0.625rem;
+    background-color: #f3f4f6;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #4b5563;
+    border: 1px solid #e5e7eb;
 }
 
 .client-status {
     display: inline-flex;
     align-items: center;
-    padding: 0.125rem 0.5rem;
+    padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .client-status-active {
-    background-color: #d1fae5;
+    background-color: var(--success-bg);
     color: #065f46;
+}
+
+.client-status-pending {
+    background-color: var(--warning-bg);
+    color: #92400e;
 }
 
 .client-status-inactive {
     background-color: #f3f4f6;
     color: #374151;
-}
-
-.client-status-pending {
-    background-color: #fef3c7;
-    color: #92400e;
-}
-
-.client-name {
-    font-weight: 600;
-    color: #111827;
-}
-
-.client-plan {
-    color: #6b7280;
-    font-size: 0.875rem;
 }

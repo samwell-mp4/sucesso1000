@@ -1,43 +1,46 @@
 .sales-summary {
     display: grid;
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-@media (min-width: 768px) {
-    .sales-summary {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
+    margin-bottom: 2.5rem;
 }
 
 .summary-card {
-    background-color: white;
+    background-color: var(--bg-card);
     padding: 1.5rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    transition: transform 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primary-light);
 }
 
 .summary-label {
     font-size: 0.875rem;
-    font-weight: 500;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
+    font-weight: 500;
 }
 
 .summary-value {
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     font-weight: 700;
-    color: #111827;
+    color: var(--text-main);
+    line-height: 1.2;
 }
 
 .commission-value {
-    color: #10b981;
+    color: var(--success);
 }
 
 .sales-table-container {
-    background-color: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    overflow-x: auto;
+    background-color: var(--bg-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    overflow: hidden;
 }

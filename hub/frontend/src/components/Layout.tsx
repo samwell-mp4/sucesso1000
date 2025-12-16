@@ -5,7 +5,7 @@ import '../styles/Layout.css';
 
 const Layout = () => {
     return (
-        <div className="app-layout">
+        <div className="app-container">
             <Sidebar />
             <main className="main-content">
                 <Outlet />

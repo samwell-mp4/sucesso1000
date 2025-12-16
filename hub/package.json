@@ -1,0 +1,13 @@
+{
+    "name": "sucesso1000-hub-bootstrap",
+    "version": "1.0.0",
+    "description": "Bootstrap HUB for EasyPanel",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "engines": {
+        "node": ">=20"
+    },
+    "dependencies": {}
+}
