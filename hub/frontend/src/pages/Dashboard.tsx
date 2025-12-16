@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Bot, Users, Calendar, MessageSquare, DollarSign } from 'lucide-react';
 import '../styles/Dashboard.css';
