@@ -16,7 +16,14 @@ import {
 } from 'lucide-react';
 import '../styles/Sidebar.css';
 
-const Sidebar = () => {
+import { X } from 'lucide-react';
+
+interface SidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const { user, logout } = useAuth();
     const isAdmin = user?.role === 'admin';
 
@@ -37,42 +44,51 @@ const Sidebar = () => {
     }
 
     return (
-        <aside className="sidebar">
-            <div className="sidebar-header">
-                <div className="logo-container">
-                    <div className="logo-icon">S</div>
-                    <h1 className="sidebar-logo">Sucesso1000</h1>
-                </div>
-            </div>
-
-            <nav className="sidebar-nav">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.to}
-                        to={item.to}
-                        className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                    >
-                        <item.icon className="nav-icon" size={20} />
-                        <span>{item.label}</span>
-                    </NavLink>
-                ))}
-            </nav>
-
-            <div className="sidebar-footer">
-                <div className="user-info">
-                    <div className="user-avatar">
-                        <User size={20} color="#fff" />
+        <>
+            <div className={`sidebar-overlay ${isOpen ? 'open' : ''}`} onClick={onClose} />
+            <aside className={`sidebar ${isOpen ? 'open' : ''}`}>
+                <div className="sidebar-header">
+                    <div className="logo-container">
+                        <div className="logo-icon">
+                            <LayoutDashboard size={24} />
+                        </div>
+                        <h2>Sucesso1000</h2>
                     </div>
-                    <div className="user-details">
-                        <div className="user-name">{user?.name}</div>
-                        <div className="user-role">{user?.role === 'admin' ? 'Admin' : 'Vendedor'}</div>
-                    </div>
+                    <button className="mobile-close-btn" onClick={onClose}>
+                        <X size={24} />
+                    </button>
                 </div>
-                <button onClick={logout} className="logout-button">
-                    <LogOut size={18} />
-                </button>
-            </div>
-        </aside>
+
+                <nav className="sidebar-nav">
+                    {navItems.map((item) => (
+                        <NavLink
+                            key={item.to}
+                            to={item.to}
+                            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+                            onClick={onClose}
+                        >
+                            <item.icon size={20} />
+                            <span>{item.label}</span>
+                        </NavLink>
+                    ))}
+                </nav>
+
+                <div className="sidebar-footer">
+                    <div className="user-info">
+                        <div className="user-avatar">
+                            <User size={20} />
+                        </div>
+                        <div className="user-details">
+                            <span className="user-name">{user?.name || 'Usuário'}</span>
+                            <span className="user-role">{isAdmin ? 'Admin' : 'Vendedor'}</span>
+                        </div>
+                    </div>
+                    <button onClick={logout} className="logout-button" title="Sair">
+                        <LogOut size={18} />
+                    </button>
+                </div>
+            </aside>
+        </>
     );
 };
 

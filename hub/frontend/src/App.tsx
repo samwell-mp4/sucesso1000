@@ -2,20 +2,22 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Robots from './pages/Robots';
 import Clients from './pages/Clients';
 import ClientDetails from './pages/ClientDetails';
-import Schedule from './pages/Schedule';
-import Conversations from './pages/Conversations';
-import Sales from './pages/Sales';
 import Financial from './pages/Financial';
-import Affiliates from './pages/Affiliates';
+import ClientRobots from './components/ClientRobots';
+import Schedule from './pages/Schedule';
+
+
 // Settings page
 import Settings from './pages/SettingsPage';
-import SeedData from './pages/SeedData';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
-import './styles/index.css';
+import AffiliatesLayout from './components/affiliates/AffiliatesLayout';
+import AffiliatesDashboard from './components/affiliates/AffiliatesDashboard';
+import AffiliatesList from './components/affiliates/AffiliatesList';
+import CommissionsList from './components/affiliates/CommissionsList';
+import AffiliatePayments from './components/affiliates/AffiliatePayments';
 import './styles/Modal.css';
 
 function App() {
@@ -25,22 +27,30 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
 
+          {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route element={<Layout />}>
+              <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/robots" element={<Robots />} />
               <Route path="/clients" element={<Clients />} />
               <Route path="/clients/:id" element={<ClientDetails />} />
-              <Route path="/schedule" element={<Schedule />} />
-              <Route path="/conversations" element={<Conversations />} />
-              <Route path="/sales" element={<Sales />} />
               <Route path="/financial" element={<Financial />} />
-              <Route path="/affiliates" element={<Affiliates />} />
+
+              {/* Affiliates Module Routes */}
+              <Route path="/affiliates" element={<AffiliatesLayout />}>
+                <Route index element={<AffiliatesDashboard />} />
+                <Route path="list" element={<AffiliatesList />} />
+                <Route path="commissions" element={<CommissionsList />} />
+                <Route path="payments" element={<AffiliatePayments />} />
+              </Route>
+
+              <Route path="/robots" element={<ClientRobots />} />
+              <Route path="/schedule" element={<Schedule />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="/seed" element={<SeedData />} />
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

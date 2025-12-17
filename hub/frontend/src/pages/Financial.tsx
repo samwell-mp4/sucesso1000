@@ -1,30 +1,40 @@
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
-import { DollarSign, TrendingUp, TrendingDown, PieChart } from 'lucide-react';
-import '../styles/ClientDetails.css'; // Reuse tab styles
-import '../styles/Robots.css'; // Reuse table styles
+import { useState } from 'react';
+import { LayoutDashboard, TrendingUp, TrendingDown, FileText, Settings, Package } from 'lucide-react';
+import FinancialDashboard from '../components/financial/FinancialDashboard';
+import FinancialIncome from '../components/financial/FinancialIncome';
+import FinancialExpenses from '../components/financial/FinancialExpenses';
+import FinancialPlans from '../components/financial/FinancialPlans';
+import '../styles/Financial.css';
 
 const Financial = () => {
     const [activeTab, setActiveTab] = useState('dashboard');
-    const [loading, setLoading] = useState(false); // Placeholder for now
+    const [autoOpenModal, setAutoOpenModal] = useState<string | null>(null);
 
     const tabs = [
-        { id: 'dashboard', label: 'Dashboard', icon: PieChart },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
         { id: 'income', label: 'Receitas', icon: TrendingUp },
         { id: 'expenses', label: 'Despesas', icon: TrendingDown },
+        { id: 'plans', label: 'Planos', icon: Package },
+        { id: 'contracts', label: 'Contratos', icon: FileText },
+        { id: 'settings', label: 'Configurações', icon: Settings },
     ];
 
+    const handleQuickAction = (type: 'income' | 'expenses') => {
+        setActiveTab(type);
+        setAutoOpenModal(type);
+    };
+
     return (
-        <div>
-            <div className="page-header">
-                <h1 className="page-title">Financeiro</h1>
-                <button className="submit-button" style={{ width: 'auto' }}>
-                    <DollarSign size={16} style={{ marginRight: '0.5rem' }} />
-                    Nova Transação
-                </button>
+        <div className="financial-page">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">
+                <div className="financial-header mb-0">
+                    <h1>Módulo Financeiro</h1>
+                    <p>Gestão completa de receitas, despesas e contratos.</p>
+                </div>
+
             </div>
 
-            <div className="tabs-container">
+            <div className="tabs-container mt-0">
                 <div className="tabs-header">
                     {tabs.map(tab => (
                         <button
@@ -39,24 +49,22 @@ const Financial = () => {
                 </div>
 
                 <div className="tabs-content-area">
-                    {activeTab === 'dashboard' && (
-                        <div className="tab-content">
-                            <h2>Visão Geral Financeira</h2>
-                            <p>Gráficos e totais (Em breve)</p>
-                        </div>
-                    )}
+                    {activeTab === 'dashboard' && <FinancialDashboard />}
                     {activeTab === 'income' && (
-                        <div className="tab-content">
-                            <h2>Receitas</h2>
-                            <p>Lista de receitas (Em breve)</p>
-                        </div>
+                        <FinancialIncome
+                            autoOpen={autoOpenModal === 'income'}
+                            onCloseAutoOpen={() => setAutoOpenModal(null)}
+                        />
                     )}
                     {activeTab === 'expenses' && (
-                        <div className="tab-content">
-                            <h2>Despesas</h2>
-                            <p>Lista de despesas (Em breve)</p>
-                        </div>
+                        <FinancialExpenses
+                            autoOpen={autoOpenModal === 'expenses'}
+                            onCloseAutoOpen={() => setAutoOpenModal(null)}
+                        />
                     )}
+                    {activeTab === 'plans' && <FinancialPlans />}
+                    {activeTab === 'contracts' && <div className="placeholder-tab">Módulo de Contratos em desenvolvimento</div>}
+                    {activeTab === 'settings' && <div className="placeholder-tab">Configurações em desenvolvimento</div>}
                 </div>
             </div>
         </div>

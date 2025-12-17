@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Megaphone, Plus, Play, Pause, Trash2, TrendingUp } from 'lucide-react';
+import { Megaphone, Plus, Play, Pause, Trash2, X } from 'lucide-react';
+import { logClientAction } from '../utils/logger';
 import '../styles/ClientDetails.css';
 
 interface Campaign {
-    id: number;
+    id: string;
     platform: 'Google Ads' | 'Meta Ads' | 'TikTok Ads';
     status: 'active' | 'paused';
     monthly_budget: number;
@@ -56,6 +57,8 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
 
             if (error) throw error;
 
+            await logClientAction(clientId, 'Tráfego', `Nova campanha criada: ${newCampaign.platform} - ${newCampaign.objective}`);
+
             setIsModalOpen(false);
             setNewCampaign({
                 platform: 'Google Ads',
@@ -72,7 +75,7 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
         }
     };
 
-    const toggleStatus = async (id: number, currentStatus: string) => {
+    const toggleStatus = async (id: string, currentStatus: string) => {
         try {
             const newStatus = currentStatus === 'active' ? 'paused' : 'active';
             const { error } = await supabase
@@ -81,6 +84,8 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
                 .eq('id', id);
 
             if (error) throw error;
+
+            await logClientAction(clientId, 'Tráfego', `Campanha ${newStatus === 'active' ? 'ativada' : 'pausada'}`);
             fetchCampaigns();
         } catch (error) {
             console.error('Error updating status:', error);
@@ -101,7 +106,7 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
                 <p>Carregando campanhas...</p>
             ) : campaigns.length === 0 ? (
                 <div className="empty-state">
-                    <Megaphone size={48} color="#d1d5db" />
+                    <Megaphone size={48} color="var(--text-secondary)" />
                     <p>Nenhuma campanha ativa para este cliente.</p>
                 </div>
             ) : (
@@ -112,7 +117,7 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
                                 <div className={`platform-badge ${campaign.platform.toLowerCase().replace(' ', '-')}`}>
                                     {campaign.platform}
                                 </div>
-                                <div className={`status-badge status-${campaign.status}`}>
+                                <div className={`status-badge status-${campaign.status === 'active' ? 'active' : 'inactive'}`}>
                                     {campaign.status === 'active' ? 'Ativo' : 'Pausado'}
                                 </div>
                             </div>
@@ -207,26 +212,75 @@ const ClientTraffic = ({ clientId }: { clientId: string }) => {
                     </div>
                 </div>
             )}
+
+            <style>{`
+                .campaigns-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                    gap: 1.5rem;
+                }
+                .campaign-card {
+                    background: var(--bg-input);
+                    border: 1px solid var(--border-color);
+                    border-radius: var(--radius-lg);
+                    padding: 1.5rem;
+                    transition: all var(--transition-fast);
+                }
+                .campaign-card:hover {
+                    border-color: var(--primary);
+                    box-shadow: var(--shadow-md);
+                }
+                .campaign-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                }
+                .platform-badge {
+                    font-weight: 600;
+                    font-size: 0.875rem;
+                    color: var(--text-main);
+                    display: flex;
+                    align-items: center;
+                }
+                .platform-badge::before {
+                    content: '';
+                    display: inline-block;
+                    width: 8px;
+                    height: 8px;
+                    border-radius: 50%;
+                    margin-right: 0.5rem;
+                }
+                .google-ads::before { background-color: #4285F4; }
+                .meta-ads::before { background-color: #1877F2; }
+                .tiktok-ads::before { background-color: #000000; border: 1px solid #333; }
+                
+                .campaign-body {
+                    margin-bottom: 1.5rem;
+                }
+                .campaign-metric {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-bottom: 0.75rem;
+                    font-size: 0.875rem;
+                }
+                .metric-label {
+                    color: var(--text-secondary);
+                }
+                .metric-value {
+                    color: var(--text-main);
+                    font-weight: 500;
+                }
+                .campaign-footer {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 0.5rem;
+                    border-top: 1px solid var(--border-color);
+                    padding-top: 1rem;
+                }
+            `}</style>
         </div>
     );
 };
-
-// Helper component for the modal close button since X is not imported
-const X = ({ size }: { size: number }) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width={size}
-        height={size}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-    >
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-    </svg>
-);
 
 export default ClientTraffic;

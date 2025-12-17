@@ -1,49 +1,142 @@
+/* Clients.css - Fixed & Dark Mode Enforced */
+
 .clients-table-container {
-    background-color: var(--bg-card);
-    border-radius: var(--radius-xl);
+    background-color: var(--bg-card) !important;
+    /* Force dark background */
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(229, 231, 235, 0.5);
     overflow: hidden;
+    margin-top: 1.5rem;
+}
+
+/* Ensure Page Header Layout */
+.page-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* Fix Button Sizing */
+.submit-button {
+    width: auto !important;
+    /* Prevent full width */
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+/* Filters Bar */
+.filters-bar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.search-box {
+    position: relative;
+    flex: 1;
+    min-width: 250px;
+}
+
+.search-box svg {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.search-box input {
+    padding-left: 2.75rem;
+    background-color: var(--bg-input) !important;
+    color: var(--text-main) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Table Styling */
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.data-table th {
+    background-color: var(--bg-card);
+    /* Header background */
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    letter-spacing: 0.05em;
+}
+
+.data-table td {
+    padding: 1.25rem 1.5rem;
+    color: var(--text-main);
+    /* Ensure text is light */
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--bg-card);
+    /* Ensure cell background is dark */
+    vertical-align: middle;
+}
+
+.data-table tr:hover td {
+    background-color: var(--bg-card-hover) !important;
 }
 
 .client-name {
     font-weight: 600;
     color: var(--text-main);
+    font-size: 0.95rem;
 }
 
-.client-plan {
-    display: inline-block;
-    padding: 0.125rem 0.625rem;
-    background-color: #f3f4f6;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #4b5563;
-    border: 1px solid #e5e7eb;
+.client-email {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
 }
 
-.client-status {
-    display: inline-flex;
-    align-items: center;
+/* Status Badges */
+.status-badge {
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    display: inline-block;
 }
 
-.client-status-active {
-    background-color: var(--success-bg);
-    color: #065f46;
+/* Action Button */
+.action-button {
+    background-color: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-md);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }
 
-.client-status-pending {
-    background-color: var(--warning-bg);
-    color: #92400e;
-}
-
-.client-status-inactive {
-    background-color: #f3f4f6;
-    color: #374151;
+.action-button:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: var(--text-secondary);
 }

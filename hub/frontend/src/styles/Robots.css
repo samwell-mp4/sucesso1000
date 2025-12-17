@@ -1,9 +1,12 @@
+/* Robots.css - Fixed & Dark Mode Enforced */
+
 .robots-table-container {
-    background-color: var(--bg-card);
-    border-radius: var(--radius-xl);
+    background-color: var(--bg-card) !important;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-sm);
-    border: 1px solid rgba(229, 231, 235, 0.5);
+    border: 1px solid var(--border-color) !important;
     overflow: hidden;
+    margin-top: 1.5rem;
 }
 
 .robot-status {
@@ -20,7 +23,7 @@
 .action-button {
     background-color: transparent;
     border: 1px solid var(--border-color);
-    color: var(--text-secondary);
+    color: var(--text-main);
     padding: 0.375rem 0.75rem;
     border-radius: var(--radius-md);
     cursor: pointer;
@@ -33,9 +36,9 @@
 }
 
 .action-button:hover {
-    background-color: #f9fafb;
-    color: var(--text-main);
-    border-color: #d1d5db;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-main) !important;
+    border-color: var(--text-secondary) !important;
 }
 
 .external-link {

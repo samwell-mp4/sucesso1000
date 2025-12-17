@@ -10,7 +10,7 @@
 }
 
 .kpi-card {
-    background: white;
+    background-color: #0f1115;
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
@@ -93,12 +93,13 @@
 
 .charts-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    background: #0f1115;
 }
 
 .chart-card {
-    background: white;
+    background: #0f1115;
     border-radius: 12px;
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
@@ -110,4 +111,14 @@
     font-weight: 600;
     color: var(--text-main);
     margin-bottom: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
 }
