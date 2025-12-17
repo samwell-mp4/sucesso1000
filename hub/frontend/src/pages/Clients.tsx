@@ -239,10 +239,22 @@ const Clients = () => {
                             {filteredClients.map((client) => (
                                 <tr key={client.id}>
                                     <td>
-                                        <div className="client-name">{client.company_name || client.name}</div>
+                                        <div
+                                            className="client-name cursor-pointer hover:underline"
+                                            onClick={() => navigate(`/clients/${client.id}`)}
+                                        >
+                                            {client.company_name || client.name}
+                                        </div>
                                         <div className="text-xs text-gray-500">{client.plan}</div>
                                     </td>
-                                    <td>{client.responsible_name || '-'}</td>
+                                    <td>
+                                        <div
+                                            className="cursor-pointer hover:underline"
+                                            onClick={() => navigate(`/clients/${client.id}`)}
+                                        >
+                                            {client.responsible_name || '-'}
+                                        </div>
+                                    </td>
                                     <td>{client.segment || '-'}</td>
                                     <td>
                                         <select
