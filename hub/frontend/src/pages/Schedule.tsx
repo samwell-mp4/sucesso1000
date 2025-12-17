@@ -61,7 +61,6 @@ const Schedule = () => {
     const navigate = useNavigate();
     const [currentDate, setCurrentDate] = useState(new Date());
     const [events, setEvents] = useState<ScheduleItem[]>([]);
-    const [loading, setLoading] = useState(true);
 
     // Modals
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,7 +96,6 @@ const Schedule = () => {
     }, [formData.client_id]);
 
     const fetchEvents = async () => {
-        setLoading(true);
         const start = startOfMonth(currentDate).toISOString();
         const end = endOfMonth(currentDate).toISOString();
 

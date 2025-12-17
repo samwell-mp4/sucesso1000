@@ -95,7 +95,7 @@ const FinancialExpenses = ({ autoOpen, onCloseAutoOpen }: FinancialExpensesProps
             fetchData();
         } catch (error) {
             console.error('Error creating expense:', error);
-            alert('Erro ao criar despesa: ' + error.message);
+            alert('Erro ao criar despesa: ' + (error as any).message);
         }
     };
 

@@ -21,7 +21,6 @@ interface FinancialIncomeProps {
 
 const FinancialIncome = ({ autoOpen, onCloseAutoOpen }: FinancialIncomeProps) => {
     const [records, setRecords] = useState<FinancialRecord[]>([]);
-    const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [isModalOpen, setIsModalOpen] = useState(false);
