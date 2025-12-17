@@ -10,9 +10,7 @@ import {
     UserCheck,
     Settings,
     LogOut,
-    User,
-    FileText,
-    Megaphone
+    User
 } from 'lucide-react';
 import '../styles/Sidebar.css';
 

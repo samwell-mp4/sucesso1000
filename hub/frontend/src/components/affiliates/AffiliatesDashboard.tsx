@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, DollarSign, TrendingUp, AlertCircle } from 'lucide-react';
+import { Users, DollarSign, TrendingUp } from 'lucide-react';
 
 const AffiliatesDashboard: React.FC = () => {
     // Mock data for now, will connect to Supabase later

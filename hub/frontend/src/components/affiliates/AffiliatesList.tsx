@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, MoreVertical, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Edit2, CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import AffiliateFormModal from './AffiliateFormModal';
 

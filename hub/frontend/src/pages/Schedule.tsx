@@ -6,12 +6,10 @@ import {
     ChevronLeft,
     ChevronRight,
     Calendar as CalendarIcon,
-    Filter,
     CheckCircle,
     Clock,
     User,
     Briefcase,
-    MapPin,
     ExternalLink,
     Edit2,
     AlertTriangle
@@ -118,8 +116,6 @@ const Schedule = () => {
             setEvents(data || []);
         } catch (error) {
             console.error('Error fetching schedule:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

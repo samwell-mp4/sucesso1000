@@ -19,11 +19,6 @@ const Financial = () => {
         { id: 'settings', label: 'Configurações', icon: Settings },
     ];
 
-    const handleQuickAction = (type: 'income' | 'expenses') => {
-        setActiveTab(type);
-        setAutoOpenModal(type);
-    };
-
     return (
         <div className="financial-page">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-8">

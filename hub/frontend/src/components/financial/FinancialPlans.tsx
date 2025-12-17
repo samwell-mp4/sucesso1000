@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Check, Edit2, Trash2, Package } from 'lucide-react';
+import { Plus, Check, Edit2, Trash2 } from 'lucide-react';
 
 interface Plan {
     id: string;
@@ -14,7 +14,6 @@ interface Plan {
 
 const FinancialPlans = () => {
     const [plans, setPlans] = useState<Plan[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingPlan, setEditingPlan] = useState<Plan | null>(null);
     const [formData, setFormData] = useState({
@@ -41,8 +40,6 @@ const FinancialPlans = () => {
             setPlans(data || []);
         } catch (error) {
             console.error('Error fetching plans:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

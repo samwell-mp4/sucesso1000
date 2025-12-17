@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Bot, Plus, Play, Pause, Trash2, X, Settings, Edit2 } from 'lucide-react';
+import { Bot, Plus, Play, Pause, Trash2, X, Settings } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import '../styles/ClientDetails.css';
 

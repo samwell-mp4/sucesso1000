@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Search, Filter, Download, Check, AlertCircle, Calendar } from 'lucide-react';
+import { Plus, Search, Check } from 'lucide-react';
 import { logClientAction } from '../../utils/logger';
 
 interface FinancialRecord {
@@ -66,8 +66,6 @@ const FinancialIncome = ({ autoOpen, onCloseAutoOpen }: FinancialIncomeProps) =>
             setRecords(data || []);
         } catch (error) {
             console.error('Error fetching income records:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

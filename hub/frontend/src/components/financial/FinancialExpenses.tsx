@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Search, Trash2, Tag, Calendar } from 'lucide-react';
+import { Plus, Search, Trash2 } from 'lucide-react';
 
 interface Expense {
     id: string;
@@ -27,7 +27,6 @@ interface FinancialExpensesProps {
 const FinancialExpenses = ({ autoOpen, onCloseAutoOpen }: FinancialExpensesProps) => {
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [newExpense, setNewExpense] = useState({
         description: '',
@@ -67,8 +66,6 @@ const FinancialExpenses = ({ autoOpen, onCloseAutoOpen }: FinancialExpensesProps
             }
         } catch (error) {
             console.error('Error fetching expenses:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

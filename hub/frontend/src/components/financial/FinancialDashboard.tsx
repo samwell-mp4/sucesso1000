@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import {
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-    AreaChart, Area, PieChart, Pie, Cell, Legend
+    AreaChart, Area, PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer, XAxis, YAxis, CartesianGrid
 } from 'recharts';
-import { DollarSign, TrendingUp, TrendingDown, Users, AlertCircle } from 'lucide-react';
+import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
 
 const FinancialDashboard = () => {
     const [metrics, setMetrics] = useState({
@@ -36,7 +35,7 @@ const FinancialDashboard = () => {
 
             if (incomeData && expenseData) {
                 calculateMetrics(incomeData, expenseData);
-                prepareChartData(incomeData, expenseData);
+                prepareChartData();
             }
         } catch (error) {
             console.error('Error fetching dashboard data:', error);
@@ -76,7 +75,7 @@ const FinancialDashboard = () => {
         });
     };
 
-    const prepareChartData = (income: any[], expenses: any[]) => {
+    const prepareChartData = () => {
         // Group by month (simplified for last 6 months)
         const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun']; // Dynamic generation needed in real app
         const data = months.map(month => ({

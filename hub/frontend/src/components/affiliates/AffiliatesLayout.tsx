@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, DollarSign, CreditCard, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, DollarSign, CreditCard } from 'lucide-react';
 import '../../styles/Financial.css'; // Reusing Financial styles for consistency
 
 const AffiliatesLayout: React.FC = () => {

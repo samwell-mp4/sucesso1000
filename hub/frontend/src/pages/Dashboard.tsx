@@ -30,7 +30,6 @@ const Dashboard = () => {
         revenue: 0,
         expenses: 0
     });
-    const [loading, setLoading] = useState(true);
 
     // Mock data for charts (replace with real data later)
     const financialData = [
@@ -67,8 +66,6 @@ const Dashboard = () => {
             });
         } catch (error) {
             console.error('Error fetching dashboard stats:', error);
-        } finally {
-            setLoading(false);
         }
     };
 

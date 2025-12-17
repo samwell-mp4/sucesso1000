@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Check, DollarSign, TrendingUp, AlertCircle, Calendar } from 'lucide-react';
+import { Plus, Check, DollarSign, TrendingUp, AlertCircle, X } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import {
     BarChart,
