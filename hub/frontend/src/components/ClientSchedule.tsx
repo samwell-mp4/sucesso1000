@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Calendar, X, Trash2, Edit2, CheckCircle, Clock, Power } from 'lucide-react';
+import { Plus, Calendar, X, Trash2, Edit2, Power } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import '../styles/ClientDetails.css';
 

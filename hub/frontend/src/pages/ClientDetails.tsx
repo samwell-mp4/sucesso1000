@@ -15,7 +15,6 @@ import {
     Building,
     Calendar,
     MessageSquare,
-    TrendingUp,
     Activity
 } from 'lucide-react';
 import '../styles/ClientDetails.css';

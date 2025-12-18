@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { MessageSquare, Calendar, User, Phone, Mail, Tag, Plus, Search, Filter } from 'lucide-react';
+import { MessageSquare, Calendar, User, Phone, Mail, Tag } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import '../styles/ClientDetails.css';
 
@@ -31,7 +31,7 @@ const ClientCRM = ({ clientId }: { clientId: string }) => {
     const [activeTab, setActiveTab] = useState<'leads' | 'history'>('leads');
 
     // Mock Leads Data
-    const [leads, setLeads] = useState<Lead[]>([
+    const [leads] = useState<Lead[]>([
         { id: '1', name: 'João Silva', source: 'WhatsApp', status: 'Novo', phone: '(11) 99999-9999', created_at: new Date().toISOString() },
         { id: '2', name: 'Maria Souza', source: 'Instagram', status: 'Em contato', email: 'maria@email.com', created_at: new Date(Date.now() - 86400000).toISOString() },
         { id: '3', name: 'Tech Solutions', source: 'Site', status: 'Reunião marcada', phone: '(11) 3333-3333', created_at: new Date(Date.now() - 172800000).toISOString() },
