@@ -13,7 +13,10 @@ import {
     Briefcase,
     MapPin,
     Building,
-    Calendar
+    Calendar,
+    MessageSquare,
+    TrendingUp,
+    Activity
 } from 'lucide-react';
 import '../styles/ClientDetails.css';
 
@@ -23,14 +26,21 @@ import ClientFinancial from '../components/ClientFinancial';
 import ClientDocuments from '../components/ClientDocuments';
 import ClientCRM from '../components/ClientCRM';
 import ClientHistory from '../components/ClientHistory';
-import ClientRobots from '../components/ClientRobots';
+import ClientWhatsAppRobot from '../components/ClientWhatsAppRobot';
 import ClientSchedule from '../components/ClientSchedule';
 
 const ClientOverview = ({ client, clientId }: { client: any, clientId: string }) => {
     const [stats, setStats] = useState({
         activeServices: 0,
         pendingFinancial: 0,
-        nextTask: null as any
+        nextTask: null as any,
+        leadsToday: 12,
+        leadsWeek: 45,
+        leadsMonth: 180,
+        messagesSent: 1250,
+        meetingsScheduled: 8,
+        responseRate: '85%',
+        botStatus: 'online'
     });
 
     useEffect(() => {
@@ -62,11 +72,12 @@ const ClientOverview = ({ client, clientId }: { client: any, clientId: string })
                 .limit(1)
                 .single();
 
-            setStats({
+            setStats(prev => ({
+                ...prev,
                 activeServices: servicesCount || 0,
                 pendingFinancial: totalPending,
                 nextTask: taskData
-            });
+            }));
         };
 
         fetchStats();
@@ -74,11 +85,60 @@ const ClientOverview = ({ client, clientId }: { client: any, clientId: string })
 
     return (
         <div className="tab-content">
-            <h2>Visão Geral</h2>
+            <h2 className="text-2xl font-bold mb-6 text-[var(--text-main)]">Dashboard Geral</h2>
 
-            {/* Quick Stats Row */}
-            {/* Quick Stats Row */}
-            <div className="overview-stats-grid">
+            {/* Mini SaaS Dashboard Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)]">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
+                            <Users size={20} />
+                        </div>
+                        <span className="text-xs font-medium text-green-500 bg-green-500/10 px-2 py-1 rounded-full">+12%</span>
+                    </div>
+                    <div className="text-2xl font-bold text-[var(--text-main)]">{stats.leadsWeek}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Leads esta semana</div>
+                </div>
+
+                <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)]">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
+                            <MessageSquare size={20} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--text-secondary)]">Total</span>
+                    </div>
+                    <div className="text-2xl font-bold text-[var(--text-main)]">{stats.messagesSent}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Mensagens enviadas</div>
+                </div>
+
+                <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)]">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
+                            <Calendar size={20} />
+                        </div>
+                        <span className="text-xs font-medium text-[var(--text-secondary)]">Agenda</span>
+                    </div>
+                    <div className="text-2xl font-bold text-[var(--text-main)]">{stats.meetingsScheduled}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Reuniões agendadas</div>
+                </div>
+
+                <div className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)]">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-500">
+                            <Activity size={20} />
+                        </div>
+                        <div className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full ${stats.botStatus === 'online' ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'}`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${stats.botStatus === 'online' ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                            {stats.botStatus === 'online' ? 'Online' : 'Offline'}
+                        </div>
+                    </div>
+                    <div className="text-2xl font-bold text-[var(--text-main)]">{stats.responseRate}</div>
+                    <div className="text-sm text-[var(--text-secondary)]">Taxa de resposta</div>
+                </div>
+            </div>
+
+            {/* Quick Stats Row (Original) */}
+            <div className="overview-stats-grid mb-8">
                 <div className="stat-card card-gradient-green">
                     <div className="stat-header">
                         <Briefcase size={20} className="text-green-500" />
@@ -267,13 +327,13 @@ const ClientDetails = () => {
 
     const tabs = [
         { id: 'overview', label: 'Visão Geral', icon: LayoutDashboard },
+        { id: 'whatsapp-robot', label: 'WhatsApp Hub Robot', icon: Bot },
+        { id: 'crm', label: 'Leads & Contatos', icon: Users },
+        { id: 'schedule', label: 'Agenda & Reuniões', icon: Calendar },
         { id: 'services', label: 'Serviços', icon: Briefcase },
-        { id: 'schedule', label: 'Agenda', icon: Calendar },
-        { id: 'robots', label: 'Robôs', icon: Bot },
         { id: 'traffic', label: 'Tráfego', icon: Megaphone },
         { id: 'financial', label: 'Financeiro', icon: DollarSign },
         { id: 'documents', label: 'Documentos', icon: FileText },
-        { id: 'crm', label: 'CRM', icon: Users },
         { id: 'history', label: 'Histórico', icon: History },
     ];
 
@@ -303,13 +363,13 @@ const ClientDetails = () => {
 
                 <div className="tabs-content-area">
                     {activeTab === 'overview' && <ClientOverview client={client} clientId={id!} />}
-                    {activeTab === 'services' && <ClientServices clientId={id!} />}
+                    {activeTab === 'whatsapp-robot' && <ClientWhatsAppRobot clientId={id!} />}
+                    {activeTab === 'crm' && <ClientCRM clientId={id!} />}
                     {activeTab === 'schedule' && <ClientSchedule clientId={id!} />}
-                    {activeTab === 'robots' && <ClientRobots clientId={id!} />}
+                    {activeTab === 'services' && <ClientServices clientId={id!} />}
                     {activeTab === 'traffic' && <ClientTraffic clientId={id!} />}
                     {activeTab === 'financial' && <ClientFinancial clientId={id!} />}
                     {activeTab === 'documents' && <ClientDocuments clientId={id!} clientData={client} />}
-                    {activeTab === 'crm' && <ClientCRM clientId={id!} />}
                     {activeTab === 'history' && <ClientHistory clientId={id!} />}
                 </div>
             </div>

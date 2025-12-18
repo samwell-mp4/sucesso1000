@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, Calendar, X, Trash2, Edit2 } from 'lucide-react';
+import { Plus, Calendar, X, Trash2, Edit2, CheckCircle, Clock, Power } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import '../styles/ClientDetails.css';
 
@@ -18,6 +18,16 @@ const ClientSchedule = ({ clientId }: { clientId: string }) => {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingEvent, setEditingEvent] = useState<ScheduleItem | null>(null);
+    const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
+
+    // Mock Automations State
+    const [automations, setAutomations] = useState([
+        { id: 'bot', label: 'Bot de WhatsApp Ativo', active: true },
+        { id: 'confirm', label: 'Confirmação de Reunião', active: true },
+        { id: 'followup', label: 'Follow-up Automático', active: false },
+        { id: 'reactivate', label: 'Reativação de Leads', active: false },
+    ]);
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -118,6 +128,15 @@ const ClientSchedule = ({ clientId }: { clientId: string }) => {
         setIsModalOpen(true);
     };
 
+    const toggleAutomation = (id: string) => {
+        setAutomations(automations.map(a => a.id === id ? { ...a, active: !a.active } : a));
+        // Log action
+        const automation = automations.find(a => a.id === id);
+        if (automation) {
+            logClientAction(clientId, 'Automação', `${automation.label} ${!automation.active ? 'ativada' : 'desativada'}`);
+        }
+    };
+
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'Concluído': return 'status-active';
@@ -136,71 +155,124 @@ const ClientSchedule = ({ clientId }: { clientId: string }) => {
         }
     };
 
+    const now = new Date();
+    const upcomingEvents = events.filter(e => new Date(e.event_date) >= now);
+    const pastEvents = events.filter(e => new Date(e.event_date) < now).reverse(); // Most recent past first
+
+    const displayedEvents = activeTab === 'upcoming' ? upcomingEvents : pastEvents;
+
     return (
         <div className="tab-content">
-            <div className="tab-header-actions">
-                <h2>Agenda do Cliente</h2>
-                <button className="submit-button" onClick={() => setIsModalOpen(true)}>
-                    <Plus size={16} style={{ marginRight: '0.5rem' }} />
-                    Novo Agendamento
-                </button>
-            </div>
-
-            {loading ? (
-                <p>Carregando agenda...</p>
-            ) : events.length === 0 ? (
-                <div className="empty-state">
-                    <Calendar size={48} color="var(--text-secondary)" />
-                    <p>Nenhum agendamento encontrado.</p>
-                </div>
-            ) : (
-                <div className="financial-table-container">
-                    <table className="data-table">
-                        <thead>
-                            <tr>
-                                <th>Data/Hora</th>
-                                <th>Título</th>
-                                <th>Tipo</th>
-                                <th>Descrição</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {events.map(event => (
-                                <tr key={event.id}>
-                                    <td>
-                                        {new Date(event.event_date).toLocaleDateString()} <br />
-                                        <span className="text-xs text-gray-500">
-                                            {new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </span>
-                                    </td>
-                                    <td className="font-medium text-white">{event.title}</td>
-                                    <td className={getTypeColor(event.type)}>{event.type}</td>
-                                    <td className="text-sm text-gray-400 max-w-xs truncate" title={event.description}>
-                                        {event.description || '-'}
-                                    </td>
-                                    <td>
-                                        <span className={`status-badge ${getStatusColor(event.status)}`}>
-                                            {event.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div className="flex gap-2">
-                                            <button onClick={() => openEdit(event)} className="icon-button" title="Editar">
-                                                <Edit2 size={16} />
-                                            </button>
-                                            <button onClick={() => handleDelete(event.id)} className="icon-button delete" title="Excluir">
-                                                <Trash2 size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+            <div className="flex flex-col lg:flex-row gap-6">
+                {/* Left Column: Automations */}
+                <div className="lg:w-1/3 space-y-6">
+                    <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] p-5">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Power size={20} className="text-[var(--primary)]" />
+                            <h3 className="text-lg font-semibold text-[var(--text-main)]">Automações Ativas</h3>
+                        </div>
+                        <div className="space-y-3">
+                            {automations.map(auto => (
+                                <div key={auto.id} className="flex items-center justify-between p-3 bg-[var(--bg-background)] rounded-lg border border-[var(--border-color)]">
+                                    <span className="text-sm font-medium text-[var(--text-main)]">{auto.label}</span>
+                                    <button
+                                        onClick={() => toggleAutomation(auto.id)}
+                                        className={`relative w-10 h-5 rounded-full transition-colors ${auto.active ? 'bg-green-500' : 'bg-gray-600'}`}
+                                    >
+                                        <span className={`absolute top-1 left-1 bg-white w-3 h-3 rounded-full transition-transform ${auto.active ? 'translate-x-5' : 'translate-x-0'}`} />
+                                    </button>
+                                </div>
                             ))}
-                        </tbody>
-                    </table>
+                        </div>
+                    </div>
+
+                    <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] p-5">
+                        <h3 className="text-lg font-semibold text-[var(--text-main)] mb-4">Resumo</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="p-3 bg-[var(--bg-background)] rounded-lg text-center">
+                                <div className="text-2xl font-bold text-[var(--primary)]">{upcomingEvents.length}</div>
+                                <div className="text-xs text-[var(--text-secondary)]">Próximas</div>
+                            </div>
+                            <div className="p-3 bg-[var(--bg-background)] rounded-lg text-center">
+                                <div className="text-2xl font-bold text-[var(--text-main)]">{pastEvents.length}</div>
+                                <div className="text-xs text-[var(--text-secondary)]">Realizadas</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            )}
+
+                {/* Right Column: Schedule */}
+                <div className="lg:w-2/3">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-2xl font-bold text-[var(--text-main)]">Agenda & Reuniões</h2>
+                        <button className="submit-button" onClick={() => setIsModalOpen(true)}>
+                            <Plus size={16} style={{ marginRight: '0.5rem' }} />
+                            Novo
+                        </button>
+                    </div>
+
+                    <div className="flex gap-2 mb-4">
+                        <button
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'upcoming' ? 'bg-[var(--primary)] text-white' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                            onClick={() => setActiveTab('upcoming')}
+                        >
+                            Próximas
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'past' ? 'bg-[var(--primary)] text-white' : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-card-hover)]'}`}
+                            onClick={() => setActiveTab('past')}
+                        >
+                            Realizadas
+                        </button>
+                    </div>
+
+                    {loading ? (
+                        <p>Carregando agenda...</p>
+                    ) : displayedEvents.length === 0 ? (
+                        <div className="empty-state bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] p-8 text-center">
+                            <Calendar size={48} color="var(--text-secondary)" className="mx-auto mb-4" />
+                            <p className="text-[var(--text-secondary)]">Nenhum agendamento encontrado.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {displayedEvents.map(event => (
+                                <div key={event.id} className="bg-[var(--bg-card)] p-4 rounded-xl border border-[var(--border-color)] hover:border-[var(--primary)] transition-colors flex flex-col md:flex-row gap-4">
+                                    <div className="flex-shrink-0 flex flex-col items-center justify-center bg-[var(--bg-background)] rounded-lg p-3 min-w-[80px]">
+                                        <span className="text-xs text-[var(--text-secondary)] uppercase">{new Date(event.event_date).toLocaleString('default', { month: 'short' })}</span>
+                                        <span className="text-xl font-bold text-[var(--text-main)]">{new Date(event.event_date).getDate()}</span>
+                                        <span className="text-xs text-[var(--text-secondary)]">{new Date(event.event_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
+
+                                    <div className="flex-grow">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <h4 className="font-bold text-[var(--text-main)] text-lg">{event.title}</h4>
+                                                <span className={`text-xs font-medium px-2 py-0.5 rounded-full bg-[var(--bg-background)] ${getTypeColor(event.type)}`}>
+                                                    {event.type}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button onClick={() => openEdit(event)} className="text-[var(--text-secondary)] hover:text-[var(--text-main)]">
+                                                    <Edit2 size={16} />
+                                                </button>
+                                                <button onClick={() => handleDelete(event.id)} className="text-[var(--text-secondary)] hover:text-red-500">
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p className="text-sm text-[var(--text-secondary)] mt-2 line-clamp-2">{event.description || 'Sem descrição.'}</p>
+                                        <div className="mt-3 flex items-center gap-2">
+                                            <span className={`status-badge ${getStatusColor(event.status)}`}>
+                                                {event.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {isModalOpen && (
                 <div className="modal-overlay">
