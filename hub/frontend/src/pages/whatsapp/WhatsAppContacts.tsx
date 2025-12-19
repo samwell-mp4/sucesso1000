@@ -275,7 +275,7 @@ const WhatsAppContacts = () => {
                         {filteredContacts.map((contact, index) => (
                             <div
                                 key={index}
-                                className={`contact-card ${selectedContacts.includes(contact.numeroContato) ? 'selected' : ''}`}
+                                className={`contact-card ${selectedContacts.includes(contact.numeroContato) ? 'selected' : ''} ${openStatusMenu === contact.numeroContato ? 'menu-open' : ''}`}
                             >
                                 <div className="card-header">
                                     <div
