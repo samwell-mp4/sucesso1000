@@ -300,7 +300,7 @@ const WhatsAppContacts = () => {
                                         <h3 className="contact-name">{contact.name || 'Desconhecido'}</h3>
                                         <span className="contact-phone">
                                             <Phone size={12} />
-                                            {contact.numeroContato}
+                                            <span className="phone-text">{contact.numeroContato}</span>
                                         </span>
                                     </div>
 
