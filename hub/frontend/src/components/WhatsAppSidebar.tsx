@@ -7,10 +7,11 @@ import {
     User,
     ArrowLeft,
     Zap,
-    MessageCircle
+    MessageCircle,
+    Users,
+    X
 } from 'lucide-react';
 import '../styles/Sidebar.css';
-import { X } from 'lucide-react';
 
 interface SidebarProps {
     isOpen?: boolean;
@@ -23,6 +24,8 @@ const WhatsAppSidebar = ({ isOpen, onClose }: SidebarProps) => {
 
     const navItems = [
         { to: "/whatsapp", icon: LayoutDashboard, label: "Dashboard", end: true },
+        { to: "/whatsapp/stats", icon: MessageCircle, label: "Whatsapp" },
+        { to: "/whatsapp/contacts", icon: Users, label: "Contatos" },
         { to: "/whatsapp/robots", icon: Bot, label: "Meus Robôs" },
         { to: "/whatsapp/automations", icon: Zap, label: "Automações" },
         { to: "/whatsapp/conversations", icon: MessageCircle, label: "Conversas" },

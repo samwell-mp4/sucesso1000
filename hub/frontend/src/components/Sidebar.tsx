@@ -10,7 +10,8 @@ import {
     UserCheck,
     Settings,
     LogOut,
-    User
+    User,
+    MessageCircle
 } from 'lucide-react';
 import '../styles/Sidebar.css';
 
@@ -31,6 +32,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         { to: "/robots", icon: Bot, label: "Robôs" },
         { to: "/schedule", icon: Calendar, label: "Agendamentos" },
         { to: "/conversations", icon: MessageSquare, label: "Conversas" },
+        { to: "/whatsapp-marketing", icon: MessageCircle, label: "WhatsApp" },
         { to: "/financial", icon: DollarSign, label: "Financeiro" },
         // { to: "/traffic", icon: Megaphone, label: "Tráfego Pago" }, // Future
         { to: "/affiliates", icon: UserCheck, label: "Afiliados" },

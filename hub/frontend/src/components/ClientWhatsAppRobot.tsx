@@ -21,7 +21,8 @@ import {
     Video,
     Mic,
     Edit3,
-    Save
+    Save,
+    LifeBuoy
 } from 'lucide-react';
 import { logClientAction } from '../utils/logger';
 import '../styles/ClientWhatsAppRobot.css';
@@ -104,10 +105,88 @@ const ClientWhatsAppRobot = ({ clientId }: { clientId: string }) => {
     const [trainings, setTrainings] = useState<Record<string, string>>({});
     const [saving, setSaving] = useState(false);
 
+    // Support Center State
+    const [tickets, setTickets] = useState<any[]>([]);
+    const [loadingTickets, setLoadingTickets] = useState(false);
+    const [newTicket, setNewTicket] = useState({
+        subject: '',
+        description: '',
+        priority: 'medium',
+        category: 'other'
+    });
+
+    // OpenAI Usage State
+    const [openaiUsage, setOpenaiUsage] = useState<any>(null);
+    const [loadingUsage, setLoadingUsage] = useState(false);
+
     useEffect(() => {
         fetchRobotConfig();
         fetchTrainings();
+        fetchTickets();
+        fetchOpenAIUsage();
     }, [clientId]);
+
+    const fetchOpenAIUsage = async () => {
+        try {
+            setLoadingUsage(true);
+            const response = await fetch('http://localhost:3001/api/openai/usage');
+            if (!response.ok) throw new Error('Failed to fetch usage');
+            const data = await response.json();
+            setOpenaiUsage(data);
+        } catch (error) {
+            console.error('Error fetching OpenAI usage:', error);
+        } finally {
+            setLoadingUsage(false);
+        }
+    };
+
+    const fetchTickets = async () => {
+        try {
+            setLoadingTickets(true);
+            const { data, error } = await supabase
+                .from('support_tickets')
+                .select('*')
+                .eq('client_id', clientId)
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            setTickets(data || []);
+        } catch (error) {
+            console.error('Error fetching tickets:', error);
+        } finally {
+            setLoadingTickets(false);
+        }
+    };
+
+    const handleCreateTicket = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            setSaving(true);
+            const { error } = await supabase
+                .from('support_tickets')
+                .insert([{
+                    client_id: clientId,
+                    ...newTicket
+                }]);
+
+            if (error) throw error;
+
+            await logClientAction(clientId, 'Suporte', `Novo ticket criado: ${newTicket.subject}`);
+            alert('Ticket criado com sucesso!');
+            setNewTicket({
+                subject: '',
+                description: '',
+                priority: 'medium',
+                category: 'other'
+            });
+            fetchTickets();
+        } catch (error) {
+            console.error('Error creating ticket:', error);
+            alert('Erro ao criar ticket.');
+        } finally {
+            setSaving(false);
+        }
+    };
 
     const fetchRobotConfig = async () => {
         try {
@@ -715,6 +794,192 @@ const ClientWhatsAppRobot = ({ clientId }: { clientId: string }) => {
                     </div>
                 );
 
+            case 'support':
+                return (
+                    <div className="robot-glass-panel p-6 animate-fade-in">
+                        <h3 className="robot-section-title flex items-center gap-2">
+                            <LifeBuoy size={24} className="text-[var(--primary)]" />
+                            Central de Suporte
+                        </h3>
+
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                            {/* Ticket List */}
+                            <div className="lg:col-span-2 space-y-4">
+                                <h4 className="text-lg font-medium text-[var(--text-main)] mb-4">Meus Tickets</h4>
+                                {loadingTickets ? (
+                                    <div className="text-center py-8 text-[var(--text-secondary)]">Carregando tickets...</div>
+                                ) : tickets.length === 0 ? (
+                                    <div className="text-center py-8 bg-[rgba(255,255,255,0.02)] rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                        <LifeBuoy size={48} className="mx-auto mb-3 text-[var(--text-muted)]" />
+                                        <p className="text-[var(--text-secondary)]">Nenhum ticket encontrado.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {tickets.map(ticket => (
+                                            <div key={ticket.id} className="bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)] hover:border-[var(--primary)] transition-colors">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <h5 className="font-semibold text-[var(--text-main)]">{ticket.subject}</h5>
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${ticket.status === 'open' ? 'bg-green-500/20 text-green-400' :
+                                                        ticket.status === 'in_progress' ? 'bg-yellow-500/20 text-yellow-400' :
+                                                            'bg-gray-500/20 text-gray-400'
+                                                        }`}>
+                                                        {ticket.status === 'open' ? 'Aberto' :
+                                                            ticket.status === 'in_progress' ? 'Em Andamento' : 'Fechado'}
+                                                    </span>
+                                                </div>
+                                                <p className="text-sm text-[var(--text-secondary)] line-clamp-2 mb-3">{ticket.description}</p>
+                                                <div className="flex items-center gap-4 text-xs text-[var(--text-muted)]">
+                                                    <span className="flex items-center gap-1">
+                                                        <Activity size={12} />
+                                                        Prioridade: {ticket.priority}
+                                                    </span>
+                                                    <span className="flex items-center gap-1">
+                                                        <Calendar size={12} />
+                                                        {new Date(ticket.created_at).toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* New Ticket Form */}
+                            <div className="bg-[rgba(255,255,255,0.02)] p-5 rounded-xl border border-[rgba(255,255,255,0.05)] h-fit">
+                                <h4 className="text-lg font-medium text-[var(--text-main)] mb-4">Novo Ticket</h4>
+                                <form onSubmit={handleCreateTicket} className="space-y-4">
+                                    <div className="robot-form-group">
+                                        <label className="robot-label">Assunto</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="robot-input"
+                                            value={newTicket.subject}
+                                            onChange={e => setNewTicket({ ...newTicket, subject: e.target.value })}
+                                            placeholder="Resumo do problema"
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="robot-form-group">
+                                            <label className="robot-label">Categoria</label>
+                                            <select
+                                                className="robot-select"
+                                                value={newTicket.category}
+                                                onChange={e => setNewTicket({ ...newTicket, category: e.target.value })}
+                                            >
+                                                <option value="other">Outro</option>
+                                                <option value="bug">Erro/Bug</option>
+                                                <option value="feature">Sugestão</option>
+                                                <option value="billing">Financeiro</option>
+                                            </select>
+                                        </div>
+                                        <div className="robot-form-group">
+                                            <label className="robot-label">Prioridade</label>
+                                            <select
+                                                className="robot-select"
+                                                value={newTicket.priority}
+                                                onChange={e => setNewTicket({ ...newTicket, priority: e.target.value })}
+                                            >
+                                                <option value="low">Baixa</option>
+                                                <option value="medium">Média</option>
+                                                <option value="high">Alta</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div className="robot-form-group">
+                                        <label className="robot-label">Descrição</label>
+                                        <textarea
+                                            required
+                                            className="robot-textarea"
+                                            rows={4}
+                                            value={newTicket.description}
+                                            onChange={e => setNewTicket({ ...newTicket, description: e.target.value })}
+                                            placeholder="Detalhe o que está acontecendo..."
+                                        />
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        disabled={saving}
+                                        className="w-full py-2 px-4 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-dark)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                                    >
+                                        {saving ? 'Enviando...' : (
+                                            <>
+                                                <LifeBuoy size={18} />
+                                                Abrir Ticket
+                                            </>
+                                        )}
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'usage':
+                const usageData = openaiUsage?.data?.[0]?.results?.[0];
+                const inputTokens = usageData?.input_tokens || 0;
+                const outputTokens = usageData?.output_tokens || 0;
+                const totalTokens = inputTokens + outputTokens;
+                const requests = usageData?.num_model_requests || 0;
+
+                // Estimated Cost (GPT-4o pricing: $2.50/1M input, $10.00/1M output)
+                const estimatedCost = ((inputTokens / 1000000) * 2.50) + ((outputTokens / 1000000) * 10.00);
+
+                return (
+                    <div className="robot-glass-panel p-6 animate-fade-in">
+                        <h3 className="robot-section-title flex items-center gap-2">
+                            <Zap size={24} className="text-[var(--primary)]" />
+                            Consumo de Inteligência Artificial
+                        </h3>
+                        <p className="text-[var(--text-secondary)] mb-6">Acompanhe o consumo de tokens e custos estimados da sua API OpenAI.</p>
+
+                        {loadingUsage ? (
+                            <div className="text-center py-12">
+                                <div className="w-8 h-8 border-2 border-[var(--primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                <p className="text-[var(--text-secondary)]">Carregando dados de consumo...</p>
+                            </div>
+                        ) : !openaiUsage ? (
+                            <div className="text-center py-12 bg-[rgba(255,255,255,0.02)] rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                <Zap size={48} className="mx-auto mb-3 text-[var(--text-muted)]" />
+                                <p className="text-[var(--text-secondary)]">Não foi possível carregar os dados.</p>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <div className="bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                    <div className="text-sm text-[var(--text-secondary)] mb-1">Total de Tokens</div>
+                                    <div className="text-2xl font-bold text-[var(--text-main)]">{totalTokens.toLocaleString()}</div>
+                                </div>
+                                <div className="bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                    <div className="text-sm text-[var(--text-secondary)] mb-1">Tokens de Entrada</div>
+                                    <div className="text-2xl font-bold text-blue-400">{inputTokens.toLocaleString()}</div>
+                                </div>
+                                <div className="bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                    <div className="text-sm text-[var(--text-secondary)] mb-1">Tokens de Saída</div>
+                                    <div className="text-2xl font-bold text-purple-400">{outputTokens.toLocaleString()}</div>
+                                </div>
+                                <div className="bg-[rgba(255,255,255,0.03)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)]">
+                                    <div className="text-sm text-[var(--text-secondary)] mb-1">Custo Estimado</div>
+                                    <div className="text-2xl font-bold text-green-400">$ {estimatedCost.toFixed(4)}</div>
+                                </div>
+
+                                <div className="col-span-full mt-4 bg-[rgba(255,255,255,0.02)] p-4 rounded-xl border border-[rgba(255,255,255,0.05)] flex items-center justify-between">
+                                    <div>
+                                        <div className="text-sm text-[var(--text-secondary)]">Requisições Totais</div>
+                                        <div className="text-xl font-bold text-[var(--text-main)]">{requests} calls</div>
+                                    </div>
+                                    <div className="text-xs text-[var(--text-muted)] text-right">
+                                        Dados atualizados do mês atual.<br />
+                                        Estimativa baseada em GPT-4o.
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+
             default:
                 return <div className="text-center text-[var(--text-secondary)] mt-10">Selecione uma opção no menu lateral</div>;
         }
@@ -779,6 +1044,12 @@ const ClientWhatsAppRobot = ({ clientId }: { clientId: string }) => {
                     </div>
                     <div className={`robot-sidebar-item ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
                         <Settings size={18} /> Configurações
+                    </div>
+                    <div className={`robot-sidebar-item ${activeTab === 'support' ? 'active' : ''}`} onClick={() => setActiveTab('support')}>
+                        <LifeBuoy size={18} /> Suporte
+                    </div>
+                    <div className={`robot-sidebar-item ${activeTab === 'usage' ? 'active' : ''}`} onClick={() => setActiveTab('usage')}>
+                        <Zap size={18} /> Consumo IA
                     </div>
                 </div>
 

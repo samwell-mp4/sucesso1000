@@ -15,6 +15,63 @@ app.get('/health', (req, res) => {
   res.send('Sucesso1000 Hub Backend is running');
 });
 
+// OpenAI Usage Endpoint
+app.get('/api/openai/usage', async (req, res) => {
+  try {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    // Calculate start of current month
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startTime = Math.floor(startOfMonth.getTime() / 1000);
+
+    // 1. Test Key Validity (Fetch Models)
+    try {
+      const modelsResponse = await fetch('https://api.openai.com/v1/models?limit=1', {
+        headers: { 'Authorization': `Bearer ${apiKey}` }
+      });
+
+      if (!modelsResponse.ok) {
+        throw new Error(`Invalid API Key (Models check failed: ${modelsResponse.status})`);
+      }
+    } catch (modelError) {
+      console.error('Key validation failed:', modelError);
+      return res.status(401).json({
+        error: 'Invalid API Key',
+        details: 'A chave não funcionou nem para listar modelos. Verifique se ela está ativa.'
+      });
+    }
+
+    // 2. Fetch Usage
+    const response = await fetch(`https://api.openai.com/v1/organization/usage/completions?start_time=${startTime}&limit=10`, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('OpenAI API Error:', errorText);
+
+      if (response.status === 403) {
+        return res.status(403).json({
+          error: 'Permission Denied',
+          details: 'Sua chave funciona para modelos, mas não tem permissão de LEITURA DE USO (Organization Usage). Chaves de Projeto (sk-proj) muitas vezes não têm esse acesso. Tente usar uma chave de Usuário (User Key) ou Admin.'
+        });
+      }
+
+      throw new Error(`OpenAI API responded with ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching OpenAI usage:', error);
+    res.status(500).json({ error: 'Failed to fetch OpenAI usage data', details: error.message });
+  }
+});
+
 // Routes will be imported here
 // app.use('/api/auth', authRoutes);
 // app.use('/api/robots', robotRoutes);
