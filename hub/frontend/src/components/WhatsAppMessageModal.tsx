@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { X, Send, Image as ImageIcon, Video, FileText, Loader2 } from 'lucide-react';
 import '../styles/WhatsAppMessageModal.css';
 
 interface WhatsAppMessageModalProps {
@@ -8,16 +8,24 @@ interface WhatsAppMessageModalProps {
     initialPhoneNumber?: string;
 }
 
+type MediaType = 'image' | 'video' | 'pdf';
+
 const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onClose, initialPhoneNumber = '' }) => {
     const [loading, setLoading] = useState(false);
     const [phoneNumber, setPhoneNumber] = useState(initialPhoneNumber);
     const [message, setMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [mediaType, setMediaType] = useState<MediaType>('image');
     const [webhookUrl] = useState('https://evolution-n8n.o9g2gq.easypanel.host/webhook/7e550a60-9584-4023-addd-1e1f22fff289');
 
     useEffect(() => {
         setPhoneNumber(initialPhoneNumber);
     }, [initialPhoneNumber]);
+
+    useEffect(() => {
+        // Reset selected file when media type changes
+        setSelectedFile(null);
+    }, [mediaType]);
 
     if (!isOpen) return null;
 
@@ -38,6 +46,19 @@ const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onC
         });
     };
 
+    const getAcceptType = (): string => {
+        switch (mediaType) {
+            case 'image':
+                return 'image/*';
+            case 'video':
+                return 'video/*';
+            case 'pdf':
+                return 'application/pdf';
+            default:
+                return '*/*';
+        }
+    };
+
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -55,35 +76,32 @@ const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onC
 
         try {
             const formattedPhone = formatPhoneNumber(phoneNumber);
-            let base64Image = null;
+            let base64Media = null;
             let fileName = null;
             let mimeType = null;
 
             if (selectedFile) {
                 try {
-                    base64Image = await convertToBase64(selectedFile);
+                    base64Media = await convertToBase64(selectedFile);
                     fileName = selectedFile.name;
                     mimeType = selectedFile.type;
                 } catch (fileError) {
                     console.error('Error reading file:', fileError);
-                    alert('Erro ao ler o arquivo de imagem.');
+                    alert('Erro ao ler o arquivo.');
                     setLoading(false);
                     return;
                 }
             }
 
-            const rawBase64 = base64Image ? base64Image.split(',')[1] : null;
+            const rawBase64 = base64Media ? base64Media.split(',')[1] : null;
 
             const payload = {
                 number: formattedPhone,
                 message: message,
-                image: base64Image,
-                media: rawBase64,
                 base64: rawBase64,
                 fileName: fileName,
-                mediatype: mimeType,
                 mimeType: mimeType,
-                type: selectedFile ? 'image' : 'text'
+                type: selectedFile ? mediaType : 'text'
             };
 
             console.log('Sending payload:', payload);
@@ -140,6 +158,45 @@ const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onC
                     </div>
 
                     <div className="form-group">
+                        <label>Tipo de Mídia</label>
+                        <div className="media-type-selector">
+                            <label className={`media-type-option ${mediaType === 'image' ? 'active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="mediaType"
+                                    value="image"
+                                    checked={mediaType === 'image'}
+                                    onChange={(e) => setMediaType(e.target.value as MediaType)}
+                                />
+                                <ImageIcon size={20} />
+                                <span>Imagem</span>
+                            </label>
+                            <label className={`media-type-option ${mediaType === 'video' ? 'active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="mediaType"
+                                    value="video"
+                                    checked={mediaType === 'video'}
+                                    onChange={(e) => setMediaType(e.target.value as MediaType)}
+                                />
+                                <Video size={20} />
+                                <span>Vídeo</span>
+                            </label>
+                            <label className={`media-type-option ${mediaType === 'pdf' ? 'active' : ''}`}>
+                                <input
+                                    type="radio"
+                                    name="mediaType"
+                                    value="pdf"
+                                    checked={mediaType === 'pdf'}
+                                    onChange={(e) => setMediaType(e.target.value as MediaType)}
+                                />
+                                <FileText size={20} />
+                                <span>PDF</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="form-group">
                         <label>Mensagem</label>
                         <textarea
                             placeholder="Digite sua mensagem..."
@@ -151,18 +208,20 @@ const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onC
                     </div>
 
                     <div className="form-group">
-                        <label>Imagem (Opcional)</label>
+                        <label>Arquivo (Opcional)</label>
                         <div className="file-input-wrapper">
                             <input
                                 type="file"
-                                accept="image/*"
+                                accept={getAcceptType()}
                                 onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-                                id="image-upload"
+                                id="media-upload"
                                 className="hidden"
                             />
-                            <label htmlFor="image-upload" className="file-label">
-                                <ImageIcon size={18} />
-                                {selectedFile ? selectedFile.name : 'Selecionar Imagem'}
+                            <label htmlFor="media-upload" className="file-label">
+                                {mediaType === 'image' && <ImageIcon size={18} />}
+                                {mediaType === 'video' && <Video size={18} />}
+                                {mediaType === 'pdf' && <FileText size={18} />}
+                                {selectedFile ? selectedFile.name : `Selecionar ${mediaType === 'image' ? 'Imagem' : mediaType === 'video' ? 'Vídeo' : 'PDF'}`}
                             </label>
                         </div>
                     </div>

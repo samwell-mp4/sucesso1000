@@ -14,6 +14,7 @@ import WhatsAppStats from './pages/whatsapp/WhatsAppStats';
 import WhatsAppContacts from './pages/whatsapp/WhatsAppContacts';
 import ClientWhatsAppRobot from './components/ClientWhatsAppRobot';
 import WhatsAppMarketing from './pages/WhatsAppMarketing';
+import Conversations from './pages/Conversations';
 
 
 // Settings page
@@ -65,7 +66,7 @@ const AppRoutes = () => {
           <Route path="contacts" element={<WhatsAppContacts />} />
           <Route path="robots" element={<ClientWhatsAppRobot clientId={user?.id || ''} />} /> {/* Reusing for now */}
           <Route path="automations" element={<div className="p-8 text-white">Automações (Em breve)</div>} />
-          <Route path="conversations" element={<div className="p-8 text-white">Conversas (Em breve)</div>} />
+          <Route path="conversations" element={<Conversations />} />
           <Route path="settings" element={<Settings />} /> {/* Reusing for now */}
         </Route>
 
