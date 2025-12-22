@@ -76,7 +76,7 @@ app.get('/api/openai/usage', async (req, res) => {
 // Webhook Proxy to bypass CORS
 app.post('/api/webhook-proxy', async (req, res) => {
   try {
-    const targetUrl = 'http://evolution-n8n.o9g2gq.easypanel.host/webhook-test/3f5f1ee0-5f73-4ee5-afbd-20be06985eef';
+    const targetUrl = 'http://evolution-n8n.o9g2gq.easypanel.host/webhook/3f5f1ee0-5f73-4ee5-afbd-20be06985eef';
 
     console.log('Proxying request to:', targetUrl);
 
