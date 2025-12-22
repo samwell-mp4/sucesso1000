@@ -16,7 +16,7 @@ const WhatsAppMessageModal: React.FC<WhatsAppMessageModalProps> = ({ isOpen, onC
     const [message, setMessage] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [mediaType, setMediaType] = useState<MediaType>('image');
-    const [webhookUrl] = useState('https://evolution-n8n.o9g2gq.easypanel.host/webhook/7e550a60-9584-4023-addd-1e1f22fff289');
+    const [webhookUrl] = useState('http://localhost:3001/api/webhook-proxy');
 
     useEffect(() => {
         setPhoneNumber(initialPhoneNumber);
